@@ -1,0 +1,95 @@
+import numpy as np
+import pandas as pd
+import os
+### Set the working directory
+os.chdir('C:\\Users\\Meghala\\Desktop\\python wd')
+## Import  train data
+train=pd.read_csv('train_u6lujuX_CVtuZ9i loan prediction.csv')
+#### Checking  for missing values
+train_missing = train.isnull().sum()
+train_missing_check = train.isnull().sum()
+#### Impute Misisng values in train
+train['Gender'].value_counts()
+new_gender = np.where(train['Gender'].isnull(),'Male',train['Gender'])
+train['Gender'] = new_gender
+c`f4train['Gender'].isnull().sum()
+
+### imoute missing values for married
+train['Married'].value_counts()
+train['Married'] = np.where(train['Married'].isnull(),'Yes', train['Married'])
+train['Married'].isnull().sum()
+
+### Replace  and Impute missing values
+train['Dependents'].value_counts()
+train['Dependents'] = train['Dependents'].replace('3+',3)
+train['Dependents'] = train['Dependents'].replace('0',0)
+train['Dependents'] = np.where(train['Dependents'].isnull(),0,train['Dependents'])
+train['Dependents'].isnull().sum()
+train['Dependents'] = pd.to_numeric(train['Dependents'])
+train['Dependents'].dtypes
+
+#### Values of Self employed
+train['Self_Employed'].value_counts()
+train['Self_Employed'] = np.where(train['Self_Employed'].isnull(),'No',train['Self_Employed'])
+train['Self_Employed'].isnull().sum()
+
+##### Impute Missing values Loan amount
+train['LoanAmount'] = np.where(train['LoanAmount'].isnull(),np.nanmedian(train['LoanAmount']),train['LoanAmount'])
+train['LoanAmount'].isnull().sum
+
+### Impute missing values for loan amount term
+
+train['Loan_Amount_Term'] = np.where(train['Loan_Amount_Term'].isnull(),np.nanmedian(train['Loan_Amount_Term']),train['Loan_Amount_Term'])
+train['Loan_Amount_Term'].isnull().sum()
+
+####### Impute missing values for credit history
+train['Credit_History'] = np.where(train['Credit_History'].isnull(),1,train['Credit_History'])
+train['Credit_History'].isnull().sum()
+train.to_csv('check.csv')
+
+
+##### Encoding the variable
+from sklearn.preprocessing import LabelEncoder
+LE = LabelEncoder()
+train['Gender'] = LE.fit_transform(train['Gender'])
+train['Gender'].value_counts()
+
+train['Married'] = LE.fir_transform(train['Married'])
+train['Married'].value_counts()
+
+train['Education'] = LE.fir_transform(train['Education'])
+train['Education'].value_counts()
+
+train['Self_Employed'] = LE.fir_transform(train['Self_Employed'])
+train['Self_Employed'].value_counts()
+
+train['Property_Area'] = LE.fir_transform(train['Property_Area'])
+train['Property_Area'].value_counts()
+
+
+train['Loan_Status'] = LE.fir_transform(train['Loan_Status'])
+train['Loan_Status'].value_counts()
+
+
+
+##### DIVIDE THE DATA TO X AND Y 
+Y = train['Loan_Status']
+X = train.iloc[:,1:11]
+
+from sklearn.linear_model import LogisticRegression
+Log_Reg = LogisticRegression()
+Log_Reg.fit(X,Y)
+Preds_Log_Reg = Log_Reg.predict(X)
+
+from sklearn.metrics import confusion_matrix
+cm_log_reg = confusion_matrix(Y, Preds_Log_Reg)
+print(cm_log_reg)
+
+################## Random Forest
+from sklearn.ensemble import RandomForestClassifier
+RF = RandomForestClassifier
+RF.fit(X,Y)
+Preds_RF = RF.fit(X,Y)
+preds_RF = RF.predict(X)
+from sklearn.metrics import confusion_matrix
+cm_log_rf = confusion_matrix(Y,preds_rf)
