@@ -1,0 +1,98 @@
+import numpy as np
+import pandas as pd
+import os
+#### import the data set
+os.chdir('C:\\Users\\Meghala\\Desktop\\python wd')
+train=pd.read_csv('friday train.csv')
+print(train.info())
+#### to know the number of observations
+len(train)
+train.head()
+train['User_ID'].isna().value_counts()
+train['Product_ID'].isna().value_counts()
+train['Gender'].isna().value_counts()
+train['Age'].isna().value_counts()
+train['Product_Category_2'].isna().value_counts()
+train.isna().sum()
+summary= train.describe()
+
+# Tocheck for Skewness and corelation
+
+train.skew()
+correlation_matrix=np.corrcoef(train['Marital_Status'],train['Purchase'])
+cor_matrix_pandas=train.corr()
+
+### to impute null values
+train['Product_Category_2'] = np.where(train['Product_Category_2'].isnull(),
+     np.nanmedian(train['Product_Category_2']),train['Product_Category_2'])
+train['Product_Category_2'].isna().value_counts()
+train['Product_Category_3'] = np.where(train['Product_Category_3'].isnull(),
+     np.nanmedian(train['Product_Category_3']),train['Product_Category_3'])
+train['Product_Category_3'].isna().value_counts()
+
+### changing the gender variable
+train['Age']=train['Age'].replace('0-17',1)
+train['Age']=train['Age'].replace('18-25',2)
+train['Age']=train['Age'].replace('26-35',3)
+train['Age']=train['Age'].replace('36-45',4)
+train['Age']=train['Age'].replace('46-50',5)
+train['Age']=train['Age'].replace('51-55',6)
+train['Age']=train['Age'].replace('55+',7)
+train['Age'] = pd.to_numeric(train['Age'])
+train['Age'].dtypes
+
+### Replace the observations in stay in current city years
+
+train['Stay_In_Current_City_Years'].value_counts()
+train['Stay_In_Current_City_Years'] = train['Stay_In_Current_City_Years'].replace('4+',4)
+train['Stay_In_Current_City_Years'] = train['Stay_In_Current_City_Years'].replace('0',0)
+train['Stay_In_Current_City_Years'] = np.where(train['Stay_In_Current_City_Years'].isnull(),0,train['Stay_In_Current_City_Years'])
+train['Stay_In_Current_City_Years'].isnull().sum()
+train['Stay_In_Current_City_Years'] = pd.to_numeric(train['Stay_In_Current_City_Years'])
+train['Stay_In_Current_City_Years'].dtypes
+
+
+train['City_Category'].value_counts()
+train['City_Category'] = train['City_Category'].replace('A',1)
+train['City_Category'] = train['City_Category'].replace('B',2)
+train['City_Category'] = train['City_Category'].replace('C',3)
+train['City_Category'].isnull().sum()
+train['City_Category'] = pd.to_numeric(train['City_Category'])
+train['City_Category'].dtypes
+
+##### Encoding the variable
+from sklearn.preprocessing import LabelEncoder
+LE = LabelEncoder()
+
+train['Gender'] = LE.fit_transform(train['Gender'])
+train['Gender'].value_counts()
+
+
+##### DIVIDE THE DATA TO X AND Y 
+Y = train['Purchase']
+X = train.iloc[:,2:10]
+
+
+from sklearn.linear_model import LinearRegression
+LR = LinearRegression()
+
+LR.fit(X,Y)
+LR.coef_
+
+LR.intercept_
+
+Preds_LR = LR.predict(X)
+
+from sklearn.metrics import mean_squared_error
+ 
+mse_lr = mean_squared_error(Y,Preds_LR)
+rmse_lr = np.sqrt(mse_lr)
+
+print(rmse_lr)
+print(mse_lr)
+
+from sklearn.ensemble import RandomForestRegressor
+
+RF = RandomForestRegressor(n_estimators=500)
+RF.fit(X,Y)
+preds_RF = RF.predict(X)
